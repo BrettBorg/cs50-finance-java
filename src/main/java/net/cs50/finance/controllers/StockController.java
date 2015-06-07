@@ -1,5 +1,9 @@
 package net.cs50.finance.controllers;
 
+import net.cs50.finance.models.Stock;
+import net.cs50.finance.models.StockHolding;
+import net.cs50.finance.models.StockLookupException;
+import net.cs50.finance.models.User;
 import net.cs50.finance.models.dao.StockHoldingDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -31,8 +35,16 @@ public class StockController extends AbstractFinanceController {
     public String quote(String symbol, Model model) {
 
         // TODO - Implement quote lookup
+        Stock stock = null;
+        try {
+            stock = Stock.lookupStock(symbol);
+        } catch (StockLookupException e) {
+            e.printStackTrace();
+        }
 
         // pass data to template
+        model.addAttribute("stock_desc", stock.toString());
+        model.addAttribute("stock_price", "$" + stock.getPrice());
         model.addAttribute("title", "Quote");
         model.addAttribute("quoteNavClass", "active");
 
@@ -51,8 +63,18 @@ public class StockController extends AbstractFinanceController {
     @RequestMapping(value = "/buy", method = RequestMethod.POST)
     public String buy(String symbol, int numberOfShares, HttpServletRequest request, Model model) {
 
-        // TODO - Implement buy action
+        // TODO - Implement buy action - done
+        User user = getUserFromSession(request);
+        StockHolding holding = null;
+        try {
+            holding = StockHolding.buyShares(user, symbol, numberOfShares);
+        } catch (StockLookupException e) {
+            e.printStackTrace();
+        }
+        stockHoldingDao.save(holding);
+        userDao.save(user);
 
+        model.addAttribute("confirmMessage", numberOfShares + " shares were bought of " + symbol);
         model.addAttribute("title", "Buy");
         model.addAttribute("action", "/buy");
         model.addAttribute("buyNavClass", "active");
@@ -71,8 +93,18 @@ public class StockController extends AbstractFinanceController {
     @RequestMapping(value = "/sell", method = RequestMethod.POST)
     public String sell(String symbol, int numberOfShares, HttpServletRequest request, Model model) {
 
-        // TODO - Implement sell action
+        // TODO - Implement sell action - done
+        User user = getUserFromSession(request);
+        StockHolding holding = null;
+        try {
+            holding = StockHolding.sellShares(user, symbol, numberOfShares);
+        } catch (StockLookupException e) {
+            e.printStackTrace();
+        }
+        stockHoldingDao.save(holding);
+        userDao.save(user);
 
+        model.addAttribute("confirmMessage", numberOfShares + " shares were sold of " + symbol);
         model.addAttribute("title", "Sell");
         model.addAttribute("action", "/sell");
         model.addAttribute("sellNavClass", "active");

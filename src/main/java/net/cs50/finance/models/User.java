@@ -27,7 +27,8 @@ public class User extends AbstractEntity {
      */
     private Map<String, StockHolding> portfolio;
 
-    // TODO - add cash to user class
+    // TODO - add cash to user class - done
+    private float cash = 10000;
 
     public User(String userName, String password) {
         this.hash = PasswordHash.getHash(password);
@@ -66,6 +67,17 @@ public class User extends AbstractEntity {
 
     private void setPortfolio(Map<String, StockHolding> portfolio) {
         this.portfolio = portfolio;
+    }
+
+
+    @NotNull
+    @Column(name = "cash")
+    public float getCash() {
+        return cash;
+    }
+
+    public void setCash(float cash) {
+        this.cash = cash;
     }
 
     void addHolding (StockHolding holding) throws IllegalArgumentException {

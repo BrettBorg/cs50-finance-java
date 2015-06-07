@@ -11,7 +11,24 @@
     <div id="middle">
 
         <!-- TODO - Display portfolio -->
-        <p>Portfolio!</p>
+        <p>Your Awesome Portfolio</p>
+
+        <table class="table table-striped">
+            <tr>
+                <th>Stock Name</th>
+                <th>Number of Shares</th>
+                <th>Stock Price</th>
+                <th>Total Stock Value</th>
+            </tr>
+            <tr th:each="holdingData : ${portfolioData}">
+                <td th:text="${holdingData.stockName}"></td>
+                <td th:text="${holdingData.stockShares}"></td>
+                <td th:text="${holdingData.stockPrice}"></td>
+                <td th:text="${holdingData.totalValue}"></td>
+            </tr>
+        </table>
+
+        <p>Cash remaining: <b th:text="${cash}"></b></p>
 
     </div>
 

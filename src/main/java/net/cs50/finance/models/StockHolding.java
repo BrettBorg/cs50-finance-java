@@ -36,7 +36,7 @@ public class StockHolding extends AbstractEntity {
     private StockHolding() {}
 
     private StockHolding(String symbol, int ownerId) {
-        // TODO - make sure symbol is always upper or lowercase (your choice)
+        // TODO - make sure symbol is always upper or lowercase (your choice) - done
         this.symbol = symbol.toUpperCase();
         this.sharesOwned = 0;
         this.ownerId = ownerId;
@@ -132,23 +132,27 @@ public class StockHolding extends AbstractEntity {
      */
     public static StockHolding buyShares(User user, String symbol, int numberOfShares) throws StockLookupException {
 
-        // TODO - make sure symbol matches case convention
-
+        // TODO - make sure symbol matches case convention - done
+        symbol = symbol.toUpperCase();
+        Stock stock = Stock.lookupStock(symbol);
+        if (user.getCash() < stock.getPrice() * numberOfShares) {
+            throw new IllegalArgumentException("Not enough money");
+        }
         // Get existing holding
         Map<String, StockHolding> userPortfolio = user.getPortfolio();
-        StockHolding holding;
 
         // Create new holding, if user has never owned the stock before
         if (!userPortfolio.containsKey(symbol)) {
-            holding = new StockHolding(symbol, user.getUid());
-            user.addHolding(holding);
+            StockHolding newHolding = new StockHolding(symbol, user.getUid());
+            user.addHolding(newHolding);
         }
 
         // Conduct buy
-        holding = userPortfolio.get(symbol);
+        StockHolding holding = userPortfolio.get(symbol);
         holding.buyShares(numberOfShares);
         
        // TODO - update user cash on buy
+        user.setCash(user.getCash() - (stock.getPrice() * numberOfShares));
 
         return holding;
     }
@@ -164,21 +168,23 @@ public class StockHolding extends AbstractEntity {
      */
     public static StockHolding sellShares(User user, String symbol, int numberOfShares) throws StockLookupException {
 
-        // TODO - make sure symbol matches case convention
+        // TODO - make sure symbol matches case convention - done
+        symbol = symbol.toUpperCase();
 
         // Get existing holding
         Map<String, StockHolding> userPortfolio = user.getPortfolio();
-        StockHolding holding;
 
         if (!userPortfolio.containsKey(symbol)) {
-            return null;
+            throw new IllegalArgumentException("You don't have this stock, fool!");
         }
 
         // Conduct sale
-        holding = userPortfolio.get(symbol);
+        StockHolding holding = userPortfolio.get(symbol);
         holding.sellShares(numberOfShares);
 
         // TODO - update user cash on sale
+        Stock currentStock = Stock.lookupStock(symbol);
+        user.setCash(user.getCash() + (currentStock.getPrice() * numberOfShares));
 
         return holding;
     }
